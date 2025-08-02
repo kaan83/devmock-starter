@@ -1,11 +1,16 @@
 import React from 'react'
-import MockForm from './components/MockForm'
+import Hero from './components/Hero'
+import Features from './components/Features'
+import WaitlistForm from './components/WaitlistForm'
+import Footer from './components/Footer'
 
 function App() {
   return (
-    <div className="p-4 font-sans">
-      <h1 className="text-2xl font-bold mb-4">DevMock App</h1>
-      <MockForm />
+    <div className="min-h-screen">
+      <Hero />
+      <Features />
+      <WaitlistForm />
+      <Footer />
     </div>
   )
 }
