@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useApi } from '../hooks/useApi';
 
 export default function WaitlistForm() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', null
-  const [errorMessage, setErrorMessage] = useState('');
+  const [submitStatus, setSubmitStatus] = useState(null);
+  const { makeRequest, isLoading: isSubmitting, error } = useApi();
 
   const {
     register,
@@ -14,35 +14,21 @@ export default function WaitlistForm() {
     reset
   } = useForm();
 
-  const onSubmit = async (data) => {
-    setIsSubmitting(true);
+  const onSubmit = useCallback(async (data) => {
     setSubmitStatus(null);
-    setErrorMessage('');
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/waitlist/', {
+      await makeRequest('/waitlist/', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(data),
       });
-
-      if (response.ok) {
-        setSubmitStatus('success');
-        reset();
-      } else {
-        const errorData = await response.json();
-        setSubmitStatus('error');
-        setErrorMessage(errorData.detail || 'Something went wrong. Please try again.');
-      }
-    } catch (error) {
+      
+      setSubmitStatus('success');
+      reset();
+    } catch (err) {
       setSubmitStatus('error');
-      setErrorMessage('Unable to connect to server. Please try again later.');
-    } finally {
-      setIsSubmitting(false);
     }
-  };
+  }, [makeRequest, reset]);
 
   return (
     <section id="waitlist" className="py-20 px-4 bg-gradient-to-br from-gray-50 to-blue-50">
@@ -157,7 +143,7 @@ export default function WaitlistForm() {
                   <span className="text-2xl">❌</span>
                   <div>
                     <h3 className="font-semibold text-red-800">Oops!</h3>
-                    <p className="text-red-600">{errorMessage}</p>
+                    <p className="text-red-600">{error}</p>
                   </div>
                 </div>
               </motion.div>
